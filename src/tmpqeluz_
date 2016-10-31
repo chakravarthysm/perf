@@ -1,0 +1,25 @@
+use std::ops::Add;
+#[derive(Debug)]
+struct Sheep<'c> {
+  age: &'c i32,
+}
+
+
+impl<'c> Add for Sheep<'c>{
+	type Output =  Sheep<'c>;
+	fn add(self,s:Sheep<'c>) -> Sheep<'c>{
+		Sheep{age:self.age+s.age}
+	}
+}
+
+impl<'c> Sheep<'c> {
+    fn grow_old(&mut self)  {
+       self.age+=self;
+    }                    
+}
+fn main() {
+    let  a = 3;
+    let mut s = Sheep { age: &a };
+    s.grow_old();
+    println!("{:?};", s)
+}

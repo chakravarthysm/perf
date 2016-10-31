@@ -1,0 +1,5 @@
+use std::synb
+use std::thread;
+use std::sync::mpsc;
+
+fn main() {}

@@ -1,0 +1,83 @@
+use std::sync::Arc;
+use std::thread;
+use std::sync::mpsc::channel;
+use std::sync::mpsc::Sender;
+use std::sync::mpsc::Receiver;
+use std::collections::HashMap;
+use std::time::Duration;
+const numPollers: i32 = 10;
+const pollInterval: i32 = 60;
+const statusInterval: i32 = 10;
+const errTimeout: i32 = 10;
+struct Resource {
+    url: &'static str,
+    errCount: i32,
+}
+
+struct State {
+    url: &'static str,
+    status: &'static str,
+}
+
+
+
+impl Resource {
+    fn Poll(&self) -> &'static str{
+        self.errCount = 0;
+        return "200 OK";
+    }
+
+    fn Sleep(&self, pendingTx: Sender<Resource>) {
+        let sleepTime = Duration::new(60, 0);
+        thread::sleep(sleepTime);
+        pendingTx.send(*self);
+    }
+}
+
+fn StateMonitor() -> Sender<Arc<S>>{
+    let (updatesTx, updatesRx) = channel::<State>();
+    let mut urlStatus = HashMap::new();
+    thread::spawn(|| {
+        for s in updatesRx.iter() {
+            urlStatus.insert(s.url, s.status);
+        }
+    });
+
+    return updatesTx;
+}
+
+
+fn Poller(pendingRx: Receiver<Arc<Resource>>,
+          completeTx: Sender<Arc<Resource>>,
+          status: Sender<Arc<State>>) {
+    for r in pendingRx.iter() {
+        let s = r.Poll();
+        let st = State{url:r.url,status:s};
+        status.send(st);
+        completeTx.send(r);
+    }
+}
+fn main() {
+    let urls = vec!["http://www.google.com/", "http://golang.org/", "http://blog.golang.org/"];
+    let (pendingTx, pendingRx) = channel::<Arc<Resource>>();
+    let (completeTx, completeRx) = channel::<Arc<Resource>>();
+
+    let status = StateMonitor();
+    for i in 0..numPollers {
+        thread::spawn(Poller(pendingRx, completeTx, status));
+    }
+
+    thread::spawn(|| {
+        for url in urls {
+            let r = Arc::new(Resource { url: url , errCount:0});
+            let r_clone = r.clone();
+            pendingTx.send(r_clone);
+        }
+    });
+
+    for r in completeRx.iter() {
+        thread::spawn(|| {
+            r.Sleep(pendingTx);
+        });
+    }
+}

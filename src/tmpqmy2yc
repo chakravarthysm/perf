@@ -1,0 +1,88 @@
+use std::sync::Arc;
+use std::thread;
+use std::sync::mpsc::channel;
+use std::sync::mpsc::Sender;
+use std::sync::mpsc::Receiver;
+use std::collections::HashMap;
+use std::time::Duration;
+const numPollers: i32 = 10;
+const pollInterval: i32 = 60;
+const statusInterval: i32 = 10;
+const errTimeout: i32 = 10;
+struct Resource<'a> {
+    url: &'static str,
+    errCount: i32,
+}
+
+struct State {
+    url: &'static str,
+    status: &'static str,
+}
+
+
+
+impl Resource f Resource<'a> {
+    fn Poll(&mut self) -> &'static str{
+        self.errCount = 0;
+        return "200 OK";
+    }
+
+    fn Sleep(self, pendingTx: Sender<&mut Arc<Resource>>) {
+        let sleepTime = Duration::new(60, 0);
+        thread::sleep(sleepTime);
+        let r = Arc::new(self);
+        let mut r_clone = r.clone();
+        pendingTx.send(&mut r_clone);
+    }
+}
+
+fn StateMonitor() -> Sender<Arc<State>>{
+    let (updatesTx, updatesRx) = channel::<Arc<State>>();
+    let mut urlStatus = HashMap::new();
+    thread::spawn(move || {
+        for s in updatesRx.iter() {
+            urlStatus.insert(s.url, s.status);
+        }
+    });
+
+    return updatesTx;
+}
+
+
+fn Poller<'b>(pendingRx: Receiver<&'b mut Arc<Resource>>,
+          completeTx: Sender<&'b mut Arc<Resource>>,
+          updatesTx: Sender<Arc<State>>) {
+    for r in pendingRx.iter() {
+        let s = r.Poll();
+        let st = Arc::new(State{url:r.url,status:s});
+        let st_clone = st.clone();
+        updatesTx.send(st_clone);
+        completeTx.send(r);
+    }
+}
+fn main() {
+    let urls = vec!["http://www.google.com/", "http://golang.org/", "http://blog.golang.org/"];
+    let (pendingTx, pendingRx) = channel::<&mut Arc<Resource>>();
+    let (completeTx, completeRx) = channel::<&mut Arc<Resource>>();
+
+    let updatesTx = StateMonitor();
+    for i in 0..numPollers {
+        thread::spawn(move||{
+        	Poller(pendingRx, completeTx, updatesTx);
+        });
+    }
+
+    thread::spawn(move|| {
+        for url in urls {
+            let r = Arc::new(Resource { url: url , errCount:0});
+            let mut r_clone = r.clone();
+            pendingTx.send(&mut r_clone);
+        }
+    });
+
+    for r in completeRx.iter() {
+        thread::spawn(move||{
+            r.Sleep(pendingTx);
+        });
+    }
+}

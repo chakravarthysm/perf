@@ -1,0 +1,4 @@
+extren cra
+fn main() {
+    println!("Hello, world!");
+}

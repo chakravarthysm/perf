@@ -1,0 +1,16 @@
+#[derive(Debug)]
+struct Sheep<'a {
+  age: &i32,
+}
+
+impl<'c> Sheep<'c> {
+    fn grow_old(&mut self)  {
+        *self.age += 100
+    }                    
+}
+fn main() {
+    let a = 3;
+    let s = Sheep { age: &a };
+    grow_old
+    println!("{:?};", s)
+}

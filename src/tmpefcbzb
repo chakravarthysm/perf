@@ -1,0 +1,4 @@
+extren c
+fn main() {
+    println!("Hello, world!");
+}

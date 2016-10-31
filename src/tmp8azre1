@@ -1,0 +1,4 @@
+e
+fn main() {
+    println!("Hello, world!");
+}

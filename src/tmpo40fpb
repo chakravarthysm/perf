@@ -1,0 +1,11 @@
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::sync::mpsc;
+
+struct Resource{
+	url string
+	errCo
+}
+fn main() {
+	let(pending)
+}

@@ -1,0 +1,30 @@
+fn check_prime(num: i32, divider: i32) -> bool {
+
+    if num % divider == 0 {
+        return false;
+    } 
+    return true;
+}
+
+fn main() {
+    let num = 7;
+     let mut status = false;
+    if num == 0 || num == 1 {
+        println!("No is a prime");
+    } else {
+       
+        let mut divider = num;
+        while divider != 1{
+           divider = d - 1;
+           status = check_prime(num,divider);
+           println!("{} {} {}",num,divider,status);
+        }
+        
+        if status{
+          println!("no is a prime");
+        } else {
+           println!("no is nt a prime");
+        }
+    }
+
+}

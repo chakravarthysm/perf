@@ -1,0 +1,46 @@
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::sync::mpsc::channel;
+use std::collections::HashMap;
+const numPollers: i32 = 10;
+const pollInterval: i32 = 60;
+const statusInterval: i32 = 10;
+const errTimeout: i32 = 10;
+struct Resource {
+    url: String,
+    errCount: i32,
+}
+
+struct State{
+	url :string,
+	status: string,
+}
+
+impl Resource {
+    fn Poll(&self) {}
+
+    fn Sleep(&self) {}
+}
+
+fn StateMonitor(){
+	let (_, updates) = channel::<State>();
+   let mut urlStatus = HashMap::new();
+	thread::spawn(||{
+       for s in updates.iter(){
+urlStatus.insert(s.url,s.status);
+       }
+	});
+}
+
+fn Poller() {
+    for i in pending {
+
+    }
+}
+fn main() {
+    let (pending, complete) = channel::<Resource>();
+  
+     for i in numPollers.E {
+     	thread::spawn(Poller(pending,complete,status));
+     }
+}

@@ -1,0 +1,58 @@
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::sync::mpsc::channel;
+use std::collections::HashMap;
+const numPollers: i32 = 10;
+const pollInterval: i32 = 60;
+const statusInterval: i32 = 10;
+const errTimeout: i32 = 10;
+struct Resource {
+    url: String,
+    errCount: i32,
+}
+
+struct State {
+    url: String,
+    status: String,
+}
+
+let urls = vec!["http://www.google.com/",
+	"http://golang.org/",
+	"http://blog.golang.org/"];
+
+impl Resource {
+    fn Poll(&self) {}
+
+    fn Sleep(&self) {}
+}
+
+fn StateMonitor(){
+    let (updatesTx, updatesRx) = channel::<State>();
+    let mut urlStatus = HashMap::new();
+    thread::spawn(|| {
+        for s in updatesRx.iter() {
+            urlStatus.insert(s.url, s.status);
+        }
+    });
+
+    return updatesTx
+}
+ let (pending, complete) = channel::<Resource>();
+ status = StateMonitor();
+fn Poller() {
+    for r in pending.iter() {
+      let s = r.Poll();
+       status.send(s);
+    }
+}
+fn main() {
+   
+   
+    for i in 0..numPollers {
+        thread::spawn(Poller(pending, complete, status));
+    }
+
+    thread.spawn(||{
+       for i in urls.enumera
+    });
+}

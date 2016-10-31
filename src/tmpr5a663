@@ -1,0 +1,4 @@
+extren crate hy
+fn main() {
+    println!("Hello, world!");
+}

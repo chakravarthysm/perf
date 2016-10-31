@@ -1,0 +1,20 @@
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::sync::mpsc::channel;
+const numPollers: i32 = 10;
+const pollInterval: i32 = 60;
+const statusInterval: i32 = 10;
+const errTimeout: i32 = 10;
+struct Resource {
+    url: String,
+    errCount: i32,
+}
+
+impl P
+
+fn Poller() {
+
+}
+fn main() {
+    let (pending, complete) = channel::<Resource>();
+}

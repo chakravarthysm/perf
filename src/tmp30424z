@@ -1,0 +1,19 @@
+use std::thread;
+use std::sync::mpsc::channel;
+
+
+
+fn main() {
+     let (tx,rx) = channel();
+  let data = Ar
+     for i in 0..10{
+     	let tx = tx.clone();
+     thread::spawn(move||{
+     		tx.send(i).unwrap();
+     	});
+     }
+
+     for _ in 0..10{
+     	println!("{}",rx.recv().unwrap());
+     }
+}

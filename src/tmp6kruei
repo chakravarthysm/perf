@@ -1,0 +1,21 @@
+use std::thread;
+use std::sync::mpsc::channel;
+use std::sync::{Arc,Mutex};
+
+
+fn main() {
+     let (tx,rx) = channel();
+  let data = Arc::new(Mutex::new(0));
+     for i in 0..3 {
+     	let (data,tx) = (data.clone(),tx.clone());
+     thread::spawn(move||{
+     	let mut data = data.lock().unwrap();
+     	*data += i;
+     		tx.send((data)).unwrap();
+     	});
+     }
+
+     for _ in 0..3{
+     	println!("{}",rx.recv().unwrap());
+     }
+}
